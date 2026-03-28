@@ -1,22 +1,35 @@
 # MediPredict-ML
 
-AI-powered Streamlit app for prediction of:
-- Diabetes
-- Heart Disease
-- Parkinson's Disease
+[![Python](https://img.shields.io/badge/Python-3.11-blue?logo=python&logoColor=white)](https://www.python.org/)
+[![Streamlit](https://img.shields.io/badge/Streamlit-Ready-FF4B4B?logo=streamlit&logoColor=white)](https://streamlit.io/)
+[![scikit-learn](https://img.shields.io/badge/scikit--learn-ML-F7931E?logo=scikitlearn&logoColor=white)](https://scikit-learn.org/)
+[![Status](https://img.shields.io/badge/Status-Active-10b981)](#)
 
-Built with ensemble machine learning pipelines, feature engineering, and a responsive clinical-style UI.
+Production-style multi-disease prediction web app built with Streamlit and ensemble machine learning.
 
-## Highlights
-- 3 disease prediction modules in one app
-- Pre-trained model artifacts included in `models/`
-- Reproducible training notebooks in `notebooks/`
-- Deployment-ready setup for Streamlit Community Cloud
+## Overview
 
-## Repository
-- GitHub: https://github.com/Ayush-Raj189/-MediPredict-ML
+MediPredict-ML provides risk prediction for three clinical domains:
+
+| Module | Problem | Input Type | Primary Output |
+|---|---|---|---|
+| Diabetes | Diabetes likelihood | 8 biomarker fields | Class + probability |
+| Heart Disease | Cardiac risk likelihood | 13 clinical fields | Class + probability |
+| Parkinson's | Parkinson's likelihood | 22 voice features | Class + probability |
+
+## Key Features
+
+| Feature | Details |
+|---|---|
+| Unified app | One interface for all 3 disease modules |
+| ML pipelines | Outlier handling, scaling, feature engineering, tuning |
+| Ensemble inference | Voting-based models for robust predictions |
+| Pretrained artifacts | Model files included in `models/` |
+| Reproducibility | Training notebooks included in `notebooks/` |
+| Deployment ready | Configured for Streamlit Community Cloud |
 
 ## Project Structure
+
 ```text
 MediPredict-ML/
 ├── app.py
@@ -42,70 +55,85 @@ MediPredict-ML/
     └── Parkinsons_Prediction_Streamlit.ipynb
 ```
 
-## Disease Modules
+## Datasets
 
-### Diabetes
-- Dataset: PIMA Indians Diabetes
-- Inputs: 8 clinical biomarkers
-- Pipeline includes zero-to-NaN handling, KNN imputation, outlier capping, SMOTE, and ensemble modeling
+| Dataset | Rows | Features | Target |
+|---|---:|---:|---|
+| PIMA Indians Diabetes | 768 | 8 | Outcome (1/0) |
+| Cleveland Heart Disease | 303 | 13 | target (1/0) |
+| Oxford Parkinson's | 195 | 22 | status (1/0) |
 
-### Heart Disease
-- Dataset: Cleveland Heart Disease
-- Inputs: 13 clinical indicators
-- Pipeline includes outlier handling, robust scaling, and voting ensemble classifier
+## ML Workflow
 
-### Parkinson's
-- Dataset: Oxford Parkinson's
-- Inputs: 22 voice biomarkers
-- Pipeline includes feature interactions, robust scaling, and ensemble modeling
+| Stage | Methods Used |
+|---|---|
+| Preprocessing | Missing handling, domain cleaning, IQR capping |
+| Feature Engineering | Interactions and derived features (module-specific) |
+| Balancing | SMOTE (where applicable) |
+| Scaling | RobustScaler |
+| Training | Multiple classifiers + cross-validation |
+| Optimization | Randomized search / tuned ensembles |
+| Export | `joblib` model artifacts |
 
-## ML Pipeline (Summary)
-1. Data cleaning and preprocessing
-2. Outlier handling (IQR capping)
-3. Feature engineering (module-specific)
-4. Class balancing (SMOTE where used)
-5. Robust scaling
-6. Multi-model training and tuning
-7. Soft voting ensemble selection
-8. Artifact export with `joblib`
+## Tech Stack
+
+| Layer | Technologies |
+|---|---|
+| Language | Python 3.11 |
+| Web App | Streamlit |
+| ML | scikit-learn, XGBoost |
+| Data | Pandas, NumPy |
+| Serialization | Joblib |
+| Notebook Workflow | Jupyter |
 
 ## Local Setup
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/Ayush-Raj189/-MediPredict-ML.git
-   cd ./-MediPredict-ML
-   ```
+
+1. Clone the repository.
+```bash
+git clone https://github.com/Ayush-Raj189/-MediPredict-ML.git
+cd ./-MediPredict-ML
+```
+
 2. Create and activate a virtual environment.
-3. Install dependencies:
-   ```bash
-   pip install -r requirements.txt
-   ```
-4. Run the app:
-   ```bash
-   streamlit run app.py
-   ```
+```bash
+python -m venv venv
+# Windows
+venv\Scripts\activate
+# macOS/Linux
+source venv/bin/activate
+```
 
-## Streamlit Community Cloud Deployment
-1. Open https://share.streamlit.io and create a new app.
-2. Select repository: `Ayush-Raj189/-MediPredict-ML`
-3. Branch: `main`
-4. Main file path: `app.py`
-5. Python version: `3.11` (from `runtime.txt`)
-6. Deploy.
+3. Install dependencies.
+```bash
+pip install -r requirements.txt
+```
 
-## Dependencies
-Defined in `requirements.txt`:
-- streamlit
-- numpy
-- pandas
-- scikit-learn
-- joblib
-- xgboost
+4. Run the app.
+```bash
+streamlit run app.py
+```
+
+## Streamlit Cloud Deployment
+
+| Setting | Value |
+|---|---|
+| Repository | `Ayush-Raj189/-MediPredict-ML` |
+| Branch | `main` |
+| Main file path | `app.py` |
+| Python version | `3.11` (from `runtime.txt`) |
+
+Deployment steps:
+1. Open Streamlit Community Cloud.
+2. Create New app.
+3. Select the repository and values above.
+4. Deploy.
 
 ## Notes
-- Model files are loaded from `models/`.
-- Datasets are in `datasets/`.
-- Keep `.streamlit/secrets.toml` local and never commit secrets.
+
+- App loads `.pkl` artifacts from `models/`.
+- Training datasets are stored in `datasets/`.
+- Keep secrets in `.streamlit/secrets.toml` (do not commit).
 
 ## Disclaimer
-This project is for educational and research use only. It is not a medical device and should not replace professional clinical judgment.
+
+This project is for education and research only. It is not a certified medical device and must not replace professional medical advice, diagnosis, or treatment.
