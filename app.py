@@ -325,6 +325,145 @@ def predict_parkinsons(models, patient: dict):
 
 
 # ─────────────────────────────────────────────────────────────────────────────
+# LIFESTYLE & FOOD RECOMMENDATIONS
+# ─────────────────────────────────────────────────────────────────────────────
+RECOMMENDATIONS = {
+    "Diabetes": {
+        "lifestyle": [
+            "Aim for 30 minutes of brisk walking or moderate exercise at least 5 days a week.",
+            "Maintain or work towards a healthy BMI (18.5-24.9). Even 5-7% weight loss can lower risk.",
+            "Avoid smoking - it worsens insulin resistance and blood sugar control.",
+            "Manage stress consistently; long-term stress can elevate blood glucose.",
+            "Prioritise 7-9 hours of quality sleep each night.",
+            "Monitor fasting blood glucose regularly and track trends over time.",
+        ],
+        "foods_eat": [
+            "Non-starchy vegetables: broccoli, spinach, kale, capsicum",
+            "Fatty fish: salmon, mackerel, sardines",
+            "Nuts and seeds: almonds, walnuts, chia, flaxseed",
+            "Legumes: lentils, chickpeas, kidney beans",
+            "Low-GI fruits: berries, apple, pear, guava",
+            "Whole grains: oats, quinoa, barley, brown rice",
+            "Lean proteins: eggs, chicken, tofu",
+        ],
+        "foods_avoid": [
+            "Sugary drinks, sodas, packaged juices",
+            "Refined carbs: white bread, maida, instant noodles",
+            "Deep-fried and processed fast foods",
+            "Sweets, cakes, pastries, and desserts",
+            "High-sodium processed snacks",
+            "Alcohol, especially sweet cocktails and beer",
+        ],
+    },
+    "Heart Disease": {
+        "lifestyle": [
+            "Exercise at least 150 min/week; cardio such as walking, cycling, or swimming is ideal.",
+            "Monitor blood pressure regularly and keep it in a healthy range.",
+            "Maintain healthy weight, especially reducing abdominal obesity.",
+            "Quit smoking as early as possible.",
+            "Practice stress management: yoga, meditation, or breathing exercises.",
+            "Get 7-8 hours of sleep and evaluate sleep issues if present.",
+            "Take prescribed medications consistently and follow up with your doctor.",
+        ],
+        "foods_eat": [
+            "Oily fish: salmon, tuna, sardines",
+            "Avocados and olive oil",
+            "Antioxidant-rich fruits: berries, pomegranate, citrus",
+            "Leafy greens: spinach, methi, arugula",
+            "Walnuts, almonds, flaxseeds",
+            "Legumes and pulses",
+            "Dark chocolate (>70% cocoa) in moderation",
+        ],
+        "foods_avoid": [
+            "Red and processed meats: sausage, bacon, salami",
+            "Trans fats and hydrogenated oils",
+            "Fried and fast foods high in saturated fats",
+            "High-salt foods: pickles, packaged snacks",
+            "Excessive alcohol intake",
+            "High intake of full-fat dairy",
+        ],
+    },
+    "Parkinson's": {
+        "lifestyle": [
+            "Regular aerobic exercise can support mobility and motor function.",
+            "Add balance and coordination training to reduce fall risk.",
+            "Seek speech therapy if voice softening or swallowing issues are noticed.",
+            "Maintain cognitive engagement through reading, puzzles, music, or social activity.",
+            "Join support groups for emotional and practical support.",
+            "Maintain a consistent sleep schedule.",
+            "Schedule regular neurology follow-ups and medication reviews.",
+        ],
+        "foods_eat": [
+            "Berries and antioxidant-rich fruits",
+            "Cruciferous vegetables: broccoli, cauliflower, Brussels sprouts",
+            "Nuts and seeds",
+            "Fatty fish with omega-3",
+            "Coffee or green tea in moderation",
+            "Extra virgin olive oil",
+            "Eggs and other choline-rich foods",
+        ],
+        "foods_avoid": [
+            "Very high protein intake around medication time (if on levodopa)",
+            "High-sugar foods",
+            "Saturated and trans fats",
+            "Alcohol, which may worsen balance and interact with treatment",
+            "Highly processed foods",
+            "Very high dairy intake",
+        ],
+    },
+}
+
+
+def render_recommendations(disease: str, prob: float):
+    """Render lifestyle and food recommendations when probability is elevated."""
+    if prob < 0.3:
+        return
+
+    rec = RECOMMENDATIONS.get(disease)
+    if not rec:
+        return
+
+    risk_note = "Elevated Risk Detected" if prob >= 0.6 else "Moderate Risk Detected"
+    risk_color = "#f43f5e" if prob >= 0.6 else "#f59e0b"
+
+    st.markdown(f"""
+    <div style="margin-top:1.5rem;">
+      <div style="display:flex; align-items:center; gap:.7rem; margin-bottom:1rem;">
+        <span style="font-size:1.4rem">💡</span>
+        <div>
+          <h3 style="margin:0; font-size:1.1rem; font-weight:700; color:#e2eaf6">
+            Personalised Recommendations
+          </h3>
+          <p style="margin:0; font-size:.78rem; color:{risk_color}; font-weight:600">
+            {risk_note} · Probability: {prob * 100:.1f}%
+          </p>
+        </div>
+      </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+    tab_ls, tab_eat, tab_avoid = st.tabs(["Lifestyle Changes", "Foods to Eat", "Foods to Avoid"])
+
+    with tab_ls:
+        st.markdown('<div style="background:#0f1929; border:1px solid #1e3050; border-radius:12px; padding:1rem 1.2rem; margin-top:.5rem;">', unsafe_allow_html=True)
+        for tip in rec["lifestyle"]:
+            st.markdown(f'<p style="color:#e2eaf6; font-size:.85rem; margin:.4rem 0; line-height:1.6">- {tip}</p>', unsafe_allow_html=True)
+        st.markdown('</div>', unsafe_allow_html=True)
+
+    with tab_eat:
+        st.markdown('<div style="background:#0a1f15; border:1px solid #10b98133; border-radius:12px; padding:1rem 1.2rem; margin-top:.5rem;">', unsafe_allow_html=True)
+        for food in rec["foods_eat"]:
+            st.markdown(f'<p style="color:#e2eaf6; font-size:.85rem; margin:.4rem 0; line-height:1.6">- {food}</p>', unsafe_allow_html=True)
+        st.markdown('</div>', unsafe_allow_html=True)
+
+    with tab_avoid:
+        st.markdown('<div style="background:#1f0a0e; border:1px solid #f43f5e33; border-radius:12px; padding:1rem 1.2rem; margin-top:.5rem;">', unsafe_allow_html=True)
+        for food in rec["foods_avoid"]:
+            st.markdown(f'<p style="color:#e2eaf6; font-size:.85rem; margin:.4rem 0; line-height:1.6">- {food}</p>', unsafe_allow_html=True)
+        st.markdown('</div>', unsafe_allow_html=True)
+
+
+# ─────────────────────────────────────────────────────────────────────────────
 # UI COMPONENTS
 # ─────────────────────────────────────────────────────────────────────────────
 def render_result_card(pred: int, prob: float, disease: str,
@@ -452,6 +591,9 @@ def render_result_card(pred: int, prob: float, disease: str,
     }}
     </style>
     """, unsafe_allow_html=True)
+
+    # Show recommendations only when probability is high enough.
+    render_recommendations(disease, prob)
 
 
 def section_header(icon, title, subtitle, accent):
@@ -707,6 +849,22 @@ elif page == "🩸  Diabetes":
             st.markdown("</div>", unsafe_allow_html=True)
 
         st.markdown("<br>", unsafe_allow_html=True)
+        with st.expander("Additional Medical History (Optional)", expanded=False):
+            st.markdown(
+                '<p style="font-size:.78rem; color:#7a93b8; margin-bottom:.8rem">This information is not used in the ML model but helps contextualise your risk.</p>',
+                unsafe_allow_html=True,
+            )
+            mh1, mh2 = st.columns(2)
+            with mh1:
+                st.selectbox("Biological Sex", ["Female", "Male", "Prefer not to say"], key="d_gender")
+                st.selectbox("Family History of Diabetes", ["No", "Yes - Parent", "Yes - Sibling", "Yes - Multiple"], key="d_fam")
+                st.selectbox("Smoking Status", ["Never", "Former smoker", "Current smoker"], key="d_smoke")
+            with mh2:
+                st.selectbox("Physical Activity Level", ["Sedentary", "Lightly active", "Moderately active", "Very active"], key="d_act")
+                st.selectbox("Diet Type", ["Omnivore", "Vegetarian", "Vegan", "Other"], key="d_diet")
+                st.multiselect("Pre-existing Conditions", ["Hypertension", "PCOS/PCOD", "Thyroid disorder", "Obesity", "Gestational diabetes"], key="d_cond")
+
+        st.markdown("<br>", unsafe_allow_html=True)
         predict_btn = st.button("🔍  Run Diabetes Prediction", use_container_width=True)
 
     with col_result:
@@ -796,6 +954,23 @@ elif page == "❤️  Heart Disease":
                                       format_func=lambda x: f"{x[0]} – {x[1]}")
 
         st.markdown("</div>", unsafe_allow_html=True)
+
+        st.markdown("<br>", unsafe_allow_html=True)
+        with st.expander("Additional Medical History (Optional)", expanded=False):
+            st.markdown(
+                '<p style="font-size:.78rem; color:#7a93b8; margin-bottom:.8rem">This information is not used in the ML model but helps contextualise your risk.</p>',
+                unsafe_allow_html=True,
+            )
+            hh1, hh2 = st.columns(2)
+            with hh1:
+                st.selectbox("Smoking Status", ["Never", "Former smoker", "Current smoker"], key="h_smoke")
+                st.selectbox("Family History of Heart Disease", ["No", "Yes - Parent", "Yes - Sibling", "Yes - Multiple"], key="h_fam")
+                st.selectbox("Diabetes Status", ["No", "Type 1", "Type 2", "Pre-diabetic"], key="h_diab")
+            with hh2:
+                st.selectbox("Physical Activity Level", ["Sedentary", "Lightly active", "Moderately active", "Very active"], key="h_act")
+                st.selectbox("Stress Level", ["Low", "Moderate", "High", "Very high"], key="h_stress")
+                st.multiselect("Pre-existing Conditions", ["Hypertension", "High cholesterol", "Previous heart attack", "Atrial fibrillation", "Kidney disease"], key="h_cond")
+
         st.markdown("<br>", unsafe_allow_html=True)
         predict_btn_h = st.button("🔍  Run Heart Disease Prediction", use_container_width=True)
 
@@ -902,6 +1077,27 @@ elif page == "🧠  Parkinson's":
             spread2 = st.number_input("spread2",  0.0, 0.6, 0.227,  step=0.001,  format="%.4f")
             d2      = st.number_input("D2",       0.0, 5.0,  2.382, step=0.001,  format="%.4f")
             ppe     = st.number_input("PPE",      0.0, 0.6,  0.206, step=0.001,  format="%.4f")
+
+    st.markdown("<br>", unsafe_allow_html=True)
+    with st.expander("Additional Medical History (Optional)", expanded=False):
+        st.markdown(
+            '<p style="font-size:.78rem; color:#7a93b8; margin-bottom:.8rem">This information is not used in the ML model but helps contextualise your risk.</p>',
+            unsafe_allow_html=True,
+        )
+        ph1, ph2 = st.columns(2)
+        with ph1:
+            st.selectbox(
+                "Biological Sex",
+                ["Male", "Female", "Prefer not to say"],
+                key="p_gender",
+                help="Parkinson's is around 1.5x more common in men.",
+            )
+            st.number_input("Age (years)", 20, 100, 60, key="p_age_ctx")
+            st.selectbox("Family History of Parkinson's", ["No", "Yes - Parent", "Yes - Sibling"], key="p_fam")
+        with ph2:
+            st.selectbox("Have you noticed tremors?", ["No", "Mild / occasional", "Moderate", "Frequent"], key="p_tremor")
+            st.selectbox("Changes in sense of smell?", ["No", "Slightly reduced", "Significantly reduced"], key="p_smell")
+            st.multiselect("Pre-existing Conditions", ["Head injury history", "Depression/anxiety", "REM sleep disorder", "Constipation (chronic)", "Pesticide exposure history"], key="p_cond")
 
     st.markdown("<br>", unsafe_allow_html=True)
     predict_btn_p = st.button("🔍  Run Parkinson's Prediction", use_container_width=True)
